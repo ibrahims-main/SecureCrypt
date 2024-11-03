@@ -71,6 +71,9 @@ std::string Cipher::unpad(const std::string& input) {
     }
 
     int padLength = static_cast<unsigned char>(input.back());
+    if (padLength > input.length()) {
+        throw std::runtime_error("Invalid padding length");
+    }
     return input.substr(0, input.length() - padLength);
 }
 
@@ -94,6 +97,9 @@ std::vector<unsigned char> Cipher::unpad(const std::vector<unsigned char>& input
     }
 
     int padLength = static_cast<unsigned char>(input.back());
+    if (padLength > input.size()) {
+        throw std::runtime_error("Invalid padding length");
+    }
     return std::vector<unsigned char>(input.begin(), input.end() - padLength);
 }
 

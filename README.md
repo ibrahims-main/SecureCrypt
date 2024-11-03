@@ -48,62 +48,83 @@ g++ -o my_program main.cpp src/securecrypt.cpp -std=c++11
 Here’s an example of how to use the `SecureCrypt` library in your project for encrypting and decrypting text, binary data, and files:
 
 ```c++
+#include "../include/securecrypt.h"
 #include <iostream>
 #include <vector>
-#include "include/securecrypt.h"
 
 int main() {
+    // Define a key and padding scheme
+    std::string key = "mysecretkey";
+    Cipher cipher(key, PaddingScheme::PKCS7);
+
+    // Test string encryption and decryption
+    std::string plaintext = "Hello, this is a test!";
+    std::string encryptedText = cipher.encrypt(plaintext);
+    std::string decryptedText = cipher.decrypt(encryptedText);
+
+    std::cout << "Original Text: " << plaintext << "\n";
+    std::cout << "Encrypted Text: " << encryptedText << "\n";
+    std::cout << "Decrypted Text: " << decryptedText << "\n\n";
+
+    // Test binary encryption and decryption
+    std::vector<unsigned char> binaryData = {'H', 'e', 'l', 'l', 'o', ' ', 'B', 'i', 'n', 'a', 'r', 'y'};
+    std::vector<unsigned char> encryptedBinaryData = cipher.encrypt(binaryData);
+    std::vector<unsigned char> decryptedBinaryData = cipher.decrypt(encryptedBinaryData);
+
+    std::cout << "Original Binary Data: ";
+    for (unsigned char c : binaryData) {
+        std::cout << c;
+    }
+    std::cout << "\nEncrypted Binary Data: ";
+    for (unsigned char c : encryptedBinaryData) {
+        std::cout << c;
+    }
+    std::cout << "\nDecrypted Binary Data: ";
+    for (unsigned char c : decryptedBinaryData) {
+        std::cout << c;
+    }
+    std::cout << "\n\n";
+
+    // Test padding and unpadding for string data
+    std::string paddedText = cipher.pad(plaintext);
+    std::string unpaddedText = cipher.unpad(paddedText);
+
+    std::cout << "Padded Text: " << paddedText << "\n";
+    std::cout << "Unpadded Text: " << unpaddedText << "\n\n";
+
+    // Test padding and unpadding for binary data
+    std::vector<unsigned char> paddedBinaryData = cipher.pad(binaryData);
+    std::vector<unsigned char> unpaddedBinaryData = cipher.unpad(paddedBinaryData);
+
+    std::cout << "Padded Binary Data: ";
+    for (unsigned char c : paddedBinaryData) {
+        std::cout << c;
+    }
+    std::cout << "\nUnpadded Binary Data: ";
+    for (unsigned char c : unpaddedBinaryData) {
+        std::cout << c;
+    }
+    std::cout << "\n\n";
+
+    // File encryption and decryption
+    const std::string inputFilePath = "example.txt";
+    const std::string encryptedFilePath = "encrypted_example.txt";
+    const std::string decryptedFilePath = "decrypted_example.txt";
+
+    // Encrypt file
     try {
-        std::string key = "mysecretkey"; // Your encryption key
-        Cipher cipher(key);
-
-        // Example with string
-        std::string plaintext = "Hello, World!";
-        std::string ciphertext = cipher.encrypt(plaintext);
-        std::string decrypted = cipher.decrypt(ciphertext);
-
-        std::cout << "Original Plaintext: " << plaintext << std::endl;
-        std::cout << "Ciphertext (hex): ";
-        for (char c : ciphertext) {
-            std::cout << std::hex << (static_cast<int>(c) & 0xff) << " ";
-        }
-        std::cout << std::endl;
-        std::cout << "Decrypted Text: " << decrypted << std::endl;
-
-        // Example with binary data
-        std::vector<unsigned char> binaryData = { 'H', 'e', 'l', 'l', 'o' };
-        std::cout << "Original Binary Data: ";
-        for (auto c : binaryData) {
-            std::cout << c;
-        }
-        std::cout << std::endl;
-
-        auto encryptedBinary = cipher.encrypt(binaryData);
-        std::cout << "Encrypted Binary Data (hex): ";
-        for (auto c : encryptedBinary) {
-            std::cout << std::hex << (static_cast<int>(c) & 0xff) << " ";
-        }
-        std::cout << std::endl;
-
-        auto decryptedBinary = cipher.decrypt(encryptedBinary);
-        std::cout << "Decrypted Binary Data: ";
-        for (auto c : decryptedBinary) {
-            std::cout << c;
-        }
-        std::cout << std::endl;
-
-        // Example with file encryption
-        std::string inputFile = "text.txt";
-        std::string encryptedFile = "encrypted.txt";
-        std::string decryptedFile = "decrypted.txt";
-
-        cipher.encryptFile(inputFile, encryptedFile);
-        cipher.decryptFile(encryptedFile, decryptedFile);
-
-        std::cout << "File encryption and decryption completed." << std::endl;
-
+        cipher.encryptFile(inputFilePath, encryptedFilePath);
+        std::cout << "File encrypted successfully.\n";
     } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+        std::cerr << "Error encrypting file: " << e.what() << "\n";
+    }
+
+    // Decrypt file
+    try {
+        cipher.decryptFile(encryptedFilePath, decryptedFilePath);
+        std::cout << "File decrypted successfully.\n";
+    } catch (const std::exception& e) {
+        std::cerr << "Error decrypting file: " << e.what() << "\n";
     }
 
     return 0;

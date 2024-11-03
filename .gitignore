@@ -3,4 +3,6 @@
 *.exe
 *.out
 .vscode
-/private
+main.cpp
+encrypted.txt
+encrypt.exe
